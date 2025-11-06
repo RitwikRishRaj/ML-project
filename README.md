@@ -48,11 +48,13 @@ This repo includes `render.yaml` and a `Procfile` for one-click deployment.
 - Create a new Web Service in Render from your Git repository.
 - Render will detect Python, run `pip install -r requirements.txt`, and start with `python app.py`.
 - Ensure the dataset file `Medicalpremium.csv` is committed to the repo (it is required at runtime).
+ - The app pins Python runtime via `runtime.txt` to `python-3.10.13` for compatibility.
+ - The app pins Python to 3.10.13 on Render via `PYTHON_VERSION=3.10.13` in `render.yaml` (and `.python-version`).
 
 ### Using render.yaml
 - If you use Infrastructure as Code, Render will pick up `render.yaml` and configure:
   - Environment: Python
-  - Build: `pip install -r requirements.txt`
+  - Build: `pip install --upgrade pip setuptools wheel && pip install -r requirements.txt`
   - Start: `python app.py`
   - Port is provided via `PORT` env var automatically; the app respects it.
 
@@ -111,6 +113,20 @@ After deploy, your service will be available at the Render-provided URL. CORS is
     }
     ```
 
+## Demonstration Video
+
+📹 **Watch the API in action with Postman:**
+
+<iframe src="https://drive.google.com/file/d/11-6erBpH7F0GoyrgCZcD4d64jbhtdXfr/preview" width="640" height="480" allow="autoplay"></iframe>
+
+**Direct Link:** [View on Google Drive](https://drive.google.com/file/d/11-6erBpH7F0GoyrgCZcD4d64jbhtdXfr/view?usp=sharing)
+
+This video demonstrates:
+- How to test the API using Postman
+- Making prediction requests with sample data
+- Understanding the API response format
+- Testing different health parameter combinations
+
 ## Example Usage with cURL
 
 ```bash
@@ -153,3 +169,19 @@ response = requests.post(
 
 print(response.json())
 ```
+
+## EDA: Generate Matplotlib Graphs
+
+Run the EDA plotting script to save graphs to the `plots/` directory:
+
+```bash
+python eda_plots.py
+```
+
+It will generate:
+- Histograms for numeric columns (e.g., `Age`, `Height`, `Weight`, `NumberOfMajorSurgeries`, `PremiumPrice`)
+- Count plots for binary columns (e.g., `Diabetes`, `AnyChronicDiseases`, ...)
+- Scatter plots of each feature vs `PremiumPrice`
+- Boxplots of `PremiumPrice` grouped by each binary feature
+- Correlation heatmap (`correlation_heatmap.png`)
+- Pairwise scatter matrix for numeric columns
